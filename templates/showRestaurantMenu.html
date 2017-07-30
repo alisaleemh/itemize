@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+  <h1 class="center-align under">{{restaurant.name}}</h1>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+
+  <ul>
+    {% for message in messages %}
+    <li><strong>{{message}}</strong></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
+
+  <div class="row">
+    <div class="col s12">
+
+  {% for i in items %}
+
+      <div class="card small blue darken-1 col s6 hoverable">
+        <div class="card-content white-text">
+          <span class="card-title">{{i.name}}</span>
+          <p class="card-text flow-text">{{i.description}} </p>
+          <br>
+          <a class="blue darken-4 waves-effect waves-light btn">{{i.price}}</a>
+        </div>
+        <div class="card-action">
+          <a href="{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id) }}">Edit Item</a>
+          <a href="{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id ) }}">Delete</a>
+        </div>
+      </div>
+        {% endfor %}
+    </div>
+  </div>
+
+
+
+
+  {% endblock %}

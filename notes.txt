@@ -1,0 +1,14 @@
+/
+/restaurant
+List all the restaurant available with links to their MenuItems. Links to add delete and edit restaurant should be there
+
+/restaurant/<restaurantid>
+List the menu item for that restaurant with add/delete/edit links for each menu item
+
+
+/restaurant/json
+returns json for a list of restaurants and their menu items
+
+
+/restaurant/<restaurant_id>/menu/json
+returns json showing a list of that restaurant's menu

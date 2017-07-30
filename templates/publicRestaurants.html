@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<ul>
+  {% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<div class="row">
+
+    {% for restaurant in restaurants %}
+
+    <div class="card blue darken-1 center-align col s4">
+      <div class="card-content white-text hoverable">
+        <span class="card-title">{{restaurant.name}}</span>
+        <a class="blue darken-4 waves-effect waves-light btn" href="{{url_for('showRestaurantMenu', restaurant_id=restaurant.id) }}">Menu</a>
+  
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+</div>
+
+
+
+
+
+{% endblock %}

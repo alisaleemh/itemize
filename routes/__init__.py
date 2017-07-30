@@ -1,1 +1,1 @@
-from restaurantMenu import restaurantMenu
+from categoryMenu import categoryMenu

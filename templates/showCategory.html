@@ -4,7 +4,7 @@
 
 
 
-  <h1 class="center-align under">{{restaurant.name}}</h1>
+  <h1 class="center-align under">{{category.name}}</h1>
 
   {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -30,8 +30,8 @@
           <a class="blue darken-4 waves-effect waves-light btn">{{i.price}}</a>
         </div>
         <div class="card-action">
-          <a href="{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id) }}">Edit Item</a>
-          <a href="{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id ) }}">Delete</a>
+          <a href="{{url_for('editItem', category_id = category.id, item_id = i.id) }}">Edit Item</a>
+          <a href="{{url_for('deleteItem', category_id = category.id, item_id = i.id ) }}">Delete</a>
         </div>
       </div>
         {% endfor %}

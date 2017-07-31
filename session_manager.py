@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
 
-engine = create_engine('sqlite:///categorymenu.db')
+engine = create_engine('sqlite:///itemize.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)

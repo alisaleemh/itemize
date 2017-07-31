@@ -15,13 +15,13 @@
 
 <div class="row">
 
-    {% for category in categorys %}
+    {% for category in categories %}
 
     <div class="card blue darken-1 center-align col s4">
       <div class="card-content white-text hoverable">
         <span class="card-title">{{category.name}}</span>
-        <a class="blue darken-4 waves-effect waves-light btn" href="{{url_for('showCategoryMenu', category_id=category.id) }}">Menu</a>
-  
+        <a class="blue darken-4 waves-effect waves-light btn" href="{{url_for('showCategory', category_id=category.id) }}">Menu</a>
+
       </div>
     </div>
 

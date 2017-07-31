@@ -55,7 +55,7 @@ class Item(Base):
         }
 
 
-engine = create_engine('sqlite:///categorymenu.db')
+engine = create_engine('sqlite:///itemize.db')
 
 
 Base.metadata.create_all(engine)

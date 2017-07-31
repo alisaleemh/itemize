@@ -202,7 +202,6 @@ def editCategory(category_id):
         return redirect('/login')
     editItem = db.session.query(Category).filter_by(id=category_id).one()
     username = getUserInfo(editItem.user_id)
-    username = getUserInfo(editItem.user_id)
 
     if username != login_session['username']:
         flash("You are not authorized to delete this category as you don't own it")
@@ -221,9 +220,13 @@ def editCategory(category_id):
 # Input: category_id
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
+    deleteItem = db.session.query(Category).filter_by(id=category_id).one()
+    username = getUserInfo(deleteItem.user_id)
     if 'username' not in login_session:
         return redirect('/login')
-    deleteItem = db.session.query(Category).filter_by(id=category_id).one()
+    if username != login_session['username']:
+        flash("You are not authorized to delete this category as you don't own it")
+        return redirect(url_for('allCategories'))
 
     if request.method == 'POST':
         db.session.delete(deleteItem)
@@ -237,10 +240,10 @@ def deleteCategory(category_id):
 # Menu of a Specific Category
 # Input: category_id
 @app.route('/category/<int:category_id>/')
-def showCategoryMenu(category_id):
+def showCategory(category_id):
     category = db.session.query(Category).filter_by(id=category_id).one()
     items = db.session.query(Item).filter_by(category_id=category.id)
-    return render_template('showCategoryMenu.html', category=category, items=items)
+    return render_template('showCategory.html', category=category, items=items)
 
 
 # New Item in a Specific Category
@@ -254,7 +257,7 @@ def newItem(category_id):
         db.session.add(newItem)
         db.session.commit()
         flash("new item successfully added")
-        return redirect(url_for('showCategoryMenu', category_id=category_id))
+        return redirect(url_for('showCategory', category_id=category_id))
     else:
         return render_template('newItem.html', category_id=category_id)
 
@@ -270,7 +273,7 @@ def editItem(category_id, item_id):
         editItem.name = request.form['name']
         db.session.commit()
         flash("menu item successfully edited")
-        return redirect(url_for('showCategoryMenu', category_id=category_id))
+        return redirect(url_for('showCategory', category_id=category_id))
     else:
         return render_template('editItem.html', category_id=category_id, item_id=item_id)
 
@@ -286,7 +289,7 @@ def deleteItem(category_id, item_id):
         db.session.delete(deleteItem)
         db.session.commit()
         flash("menu item successfully deleted")
-        return redirect(url_for('showCategoryMenu', category_id=category_id))
+        return redirect(url_for('showCategory', category_id=category_id))
     else:
         return render_template('deleteItem.html', item=deleteItem)
 

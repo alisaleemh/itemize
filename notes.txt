@@ -7,7 +7,7 @@ List the menu item for that category with add/delete/edit links for each menu it
 
 
 /category/json
-returns json for a list of categorys and their menu items
+returns json for a list of categories and their menu items
 
 
 /category/<category_id>/menu/json

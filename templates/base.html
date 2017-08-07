@@ -26,15 +26,18 @@
   <nav>
     <div class="nav-wrapper">
       <div class="container">
-        <a href="/" class="brand-logo">menu-site</a>
+        <a href="/" class="brand-logo">itemize</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
+          {% if 'username' in login_session %}
+          <li><a href="{{url_for('newCategory') }}">New Category</a></li>
+          {% endif %}
           <li><a href="/category">Categories</a></li>
           {% if 'username' not in login_session %}
-          <li><a href="/login">Login/Signup</a></li>
+          <li><a href="{{url_for('showLogin') }}">Login/Signup</a></li>
           {% endif %}
           {% if 'username' in login_session %}
           <li><a> {{login_session['username']}} </a> </li>
-          <li><a href="/gdisconnect">Logout</a></li>
+          <li><a href="{{url_for('gdisconnect') }}">Logout</a></li>
           {% endif %}
 
 

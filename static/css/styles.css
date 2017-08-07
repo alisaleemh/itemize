@@ -95,3 +95,9 @@ body { padding: 2em; }
 .loginBtn--google:focus {
   background: #E74B37;
 }
+
+/* Collection Item */
+
+.collection-text {
+  color: white;
+}

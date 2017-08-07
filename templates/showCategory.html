@@ -27,8 +27,6 @@
       <div class="card-content white-text">
         <span class="card-title">{{i.name}}</span>
         <p class="card-text flow-text">{{i.description}} </p>
-        <br>
-        <a class="blue darken-4 waves-effect waves-light btn">{{i.price}}</a>
       </div>
       <div class="card-action">
         <a href="{{url_for('editItem', category_id = category.id, item_id = i.id) }}">Edit Item</a>

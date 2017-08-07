@@ -1,5 +1,7 @@
-<html>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
+
 <h1> New Category </h1>
 
 <form action="{{url_for('newCategory')}}" method = 'POST'>
@@ -12,5 +14,4 @@
 
 </form>
 
-</body>
-</html>
+{% endblock %}

@@ -13,27 +13,35 @@
 {% endif %}
 {% endwith %}
 
-
-
 <div class="row">
 
-{% for category in categories %}
+  {% for category in categories %}
 
-<div class="card blue darken-1 center-align col s4">
-<div class="card-content white-text hoverable">
-<span class="card-title">{{category.name}}, User ID: {{category.user_id}}</span>
+  <div class="card blue darken-1 center-align col s4">
+    <div class="card-content white-text hoverable">
+      <span class="card-title">{{category.name}}, User ID: {{category.user_id}}</span>
 
-<a class="blue darken-4 waves-effect waves-light btn" href="{{url_for('showCategory', category_id=category.id) }}">Menu</a>
-<div class="card-action">
-<a href="{{url_for('editCategory', category_id=category.id) }}">Edit Item</a>
-<a href="{{url_for('deleteCategory', category_id=category.id) }}">Delete</a>
-</div>
-</div>
+      <a class="blue darken-4 waves-effect waves-light btn" href="{{url_for('showCategory', category_id=category.id) }}">Menu</a>
+      <div class="card-action">
+        <a href="{{url_for('editCategory', category_id=category.id) }}">Edit Item</a>
+        <a href="{{url_for('deleteCategory', category_id=category.id) }}">Delete</a>
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
 </div>
 
+<hr>
+
+<h3 class="center-align"> Updated Items </h3>
+<div class="collection">
+
+{% for item in items %}
+
+<a href="{{url_for('showCategory', category_id=item.category_id) }}" class="collection-item blue darken-1 hoverable"> <span class="collection-text">{{item.name}} ({{item.category.name}}) </span></a>
 {% endfor %}
 </div>
-</div> 
 
 
 

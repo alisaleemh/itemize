@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Item
+from dbSetup import Base, Category, Item
 
 engine = create_engine('sqlite:///itemize.db')
 Base.metadata.bind = engine

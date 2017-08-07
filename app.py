@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from database_setup import Category, Item, User
+from dbSetup import Category, Item, User
 from session_manager import SessionManager
 from sqlalchemy import asc, desc
 from flask import session as login_session

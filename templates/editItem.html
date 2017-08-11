@@ -4,13 +4,25 @@
 
 <h1> Edit Item </h1>
 
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<ul>
+  {% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+
 <form action="{{url_for('editItem', category_id=category_id, item_id=item_id )}}" method = 'POST'>
 
 <p>Name:</p>
 
 <input type='text' size='30' name='name'>
 
-<input type='submit' value='Create'>
+<input type='submit' value='Edit'>
 
 </form>
 

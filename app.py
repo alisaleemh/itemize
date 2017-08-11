@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import jsonify
 from dbSetup import Category, Item, User
 from session_manager import SessionManager
 from sqlalchemy import asc, desc
 from flask import session as login_session
 import random
 import string
+from functools import wraps
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
@@ -26,14 +28,18 @@ APPLICATION_NAME = "menu-site"
 def createUser(login_session):
     userExists = getUserId(login_session['email'])
     if not userExists:
-        newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
+        newUser = User(name=login_session['username'],
+                       email=login_session['email'],
+                       picture=login_session['picture'])
         db.session.add(newUser)
         db.session.commit()
-        user = db.session.query(User).filter_by(email=login_session['email']).one()
+        user = db.session.query(User).filter_by(
+               email=login_session['email']).one()
         return user.id
     else:
         flash("user already exists, cannot create.. please use another email")
         return redirect(url_for('allCategories'))
+
 
 def getUserInfo(user_id):
     user = db.session.query(User).filter_by(id=user_id).one()
@@ -47,6 +53,7 @@ def getUserId(email):
     except:
         return None
 
+
 def getAllUsers():
     try:
         users = db.session.query(User).all()
@@ -54,6 +61,14 @@ def getAllUsers():
     except:
         return None
 
+
+def loginRequired(f):
+    @wraps(f)
+    def decoratedFunction(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decoratedFunction
 
 # Login Page
 
@@ -119,8 +134,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+                   json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -152,7 +167,10 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 50px; height: 50px;border-radius: 50px ;-webkit-border-radius: 50px;-moz-border-radius: 50px;"> '
+    output += '''
+              " style = "width: 50px; height: 50px;border-radius: 50px ;
+              -webkit-border-radius: 50px;-moz-border-radius: 50px;">
+              '''
     flash("you are now logged in as %s" % login_session['username'])
 
     return output
@@ -164,10 +182,12 @@ def gdisconnect():
         return redirect('/login')
     access_token = login_session.get('access_token')
     if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps(
+                   'Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % \
+          login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
@@ -181,7 +201,8 @@ def gdisconnect():
         flash("Sucessfully logged out")
         return redirect(url_for('allCategories'))
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps(
+            'Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -193,23 +214,29 @@ def allCategories():
     categories = db.session.query(Category).all()
     items = db.session.query(Item).order_by(desc(Item.id)).limit(5)
     if 'username' not in login_session:
-        return render_template('publicCategory.html', login_session=login_session, categories=categories, items=items)
+        return render_template('publicCategory.html',
+                               login_session=login_session,
+                               categories=categories,
+                               items=items)
     else:
-        return render_template('privateCategory.html', login_session=login_session, categories=categories, items=items)
+        return render_template('privateCategory.html',
+                               login_session=login_session,
+                               categories=categories,
+                               items=items)
 
 
 # Adds a New Category
 @app.route('/category/new', methods=['GET', 'POST'])
+@loginRequired
 def newCategory():
-    if 'username' not in login_session:
-            return redirect('/login')
     if request.method == 'POST':
         if request.form['name']:
             users = getAllUsers()
             for user in users:
                 print user.id, user.email
 
-            newItem = Category(name=request.form['name'], user_id=getUserId(login_session['email']))
+            newItem = Category(name=request.form['name'],
+                               user_id=getUserId(login_session['email']))
             db.session.add(newItem)
             db.session.commit()
             flash("new category successfully created")
@@ -221,14 +248,12 @@ def newCategory():
 # Edits a Category
 # Input: category_id
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
+@loginRequired
 def editCategory(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     editItem = db.session.query(Category).filter_by(id=category_id).one()
     username = getUserInfo(editItem.user_id)
-
     if username != login_session['username']:
-        flash("You are not authorized to edit this category as you don't own it")
+        flash("You are not authorized to edit this category")
         return redirect(url_for('allCategories'))
 
     if request.method == 'POST':
@@ -243,14 +268,13 @@ def editCategory(category_id):
 # Delete a Category
 # Input: category_id
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+@loginRequired
 def deleteCategory(category_id):
     deleteItem = db.session.query(Category).filter_by(id=category_id).one()
     user = getUserInfo(deleteItem.user_id)
     username = user.email
-    if 'username' not in login_session:
-        return redirect('/login')
     if username != login_session['email']:
-        flash("You are not authorized to delete this category as you don't own it")
+        flash("You are not authorized to delete this category")
         return redirect(url_for('allCategories'))
 
     if request.method == 'POST':
@@ -268,17 +292,21 @@ def deleteCategory(category_id):
 def showCategory(category_id):
     category = db.session.query(Category).filter_by(id=category_id).one()
     items = db.session.query(Item).filter_by(category_id=category.id)
-    return render_template('showCategory.html', category=category, items=items, login_session=login_session)
+    return render_template('showCategory.html',
+                           category=category,
+                           items=items,
+                           login_session=login_session)
 
 
 # New Item in a Specific Category
 # Input: category_id
 @app.route('/category/<int:category_id>/menu/new/', methods=['GET', 'POST'])
+@loginRequired
 def newItem(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
-        newItem = Item(name=request.form['name'], category_id=category_id)
+        newItem = Item(name=request.form['name'],
+                       category_id=category_id,
+                       user_id=getUserId(login_session['email']))
         db.session.add(newItem)
         db.session.commit()
         flash("new item successfully added")
@@ -289,27 +317,39 @@ def newItem(category_id):
 
 # Edit a Item in a Specific Category
 # Input: category_id, item_id
-@app.route('/category/<int:category_id>/menu/<int:item_id>/edit/', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/menu/<int:item_id>/edit/',
+           methods=['GET', 'POST'])
+@loginRequired
 def editItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == "POST":
         editItem = db.session.query(Item).filter_by(id=item_id).one()
+        user = getUserInfo(editItem.user_id)
+        username = user.email
+        if username != login_session['email']:
+            flash("You are not authorized to edit this item, create your own")
+            return redirect(url_for('newItem', category_id=category_id))
         editItem.name = request.form['name']
         db.session.commit()
         flash("menu item successfully edited")
         return redirect(url_for('showCategory', category_id=category_id))
     else:
-        return render_template('editItem.html', category_id=category_id, item_id=item_id)
+        return render_template('editItem.html',
+                               category_id=category_id,
+                               item_id=item_id)
 
 
 # Delete a Item in a Specific Category
 # Input: category_id, item_id
-@app.route('/category/<int:category_id>/menu/<int:item_id>/delete/', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/menu/<int:item_id>/delete/',
+           methods=['GET', 'POST'])
+@loginRequired
 def deleteItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     deleteItem = db.session.query(Item).filter_by(id=item_id).one()
+    user = getUserInfo(deleteItem.user_id)
+    username = user.email
+    if username != login_session['email']:
+        flash("You are not authorized to delete this item, create your own")
+        return redirect(url_for('newItem', category_id=category_id))
     if request.method == "POST":
         db.session.delete(deleteItem)
         db.session.commit()
@@ -335,15 +375,13 @@ def showAllCategories():
     categories = db.session.query(Category).all()
     return jsonify(Categories=[i.serialize for i in categories])
 
+
 # Return a JSON object of the Menu in a Specific Category
 # Input: category_id
 @app.route('/category/<int:category_id>/json')
 def showSingleCategory(category_id):
     category = db.session.query(Category).filter_by(id=category_id).one()
     return jsonify(category=[category.serialize])
-
-
-
 
 
 if __name__ == '__main__':
